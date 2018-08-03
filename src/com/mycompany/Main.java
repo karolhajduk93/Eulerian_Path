@@ -1,14 +1,17 @@
 package com.mycompany;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends JFrame{
 
-    public static ArrayList<Node> nodes = new ArrayList<>();
-    Node node;
+    public static ArrayList<Vertex> vertices = new ArrayList<>();
+    Vertex vertex;
     boolean intersects = false;
     public static void main(String[] args) {
         //Eulerian PATH can have only 2 odd verticles - start at odd
@@ -30,37 +33,25 @@ public class Main extends JFrame{
 
         this.addMouseListener(new MouseListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                for (Node node: nodes){
-                    if(node.getBounds().contains(e.getLocationOnScreen())) {
-                            intersects = true;
-                            break;
-                    }
-                }
-                if(!intersects){
-                    node = new Node(e.getLocationOnScreen());
-                    nodes.add(node);
-                }
-                //if no in bounds create new Node - done
-            }
+            public void mouseClicked(MouseEvent e) {}
 
             @Override
             public void mousePressed(MouseEvent e) {
-                int index = 0;
+                /*int index = 0;
                 for (Node node: nodes){
-                    if(node.getBounds().contains(e.getLocationOnScreen())) {
+                    if(node.getBounds().contains(new Point(e.getX() - 10, e.getY() - 30))) {
                         intersects = true;
                         break;
                     }
                     index++;
                 }
-                System.out.println(index);
+                System.out.println(index); // ------------------
+                System.out.println("(x): " + e.getX() + " (y): " + e.getX());
                 if(!nodes.isEmpty()) {
                     if (intersects & nodes.get(index-1).isConnected ){
-                        nodes.get(index).setPoint(e.getLocationOnScreen());
-                        System.out.println("chuj");
+                        nodes.get(index).setPoint(new Point(e.getX() - 13, e.getY() - 35));
                     }
-                }
+                }*/
                 // - X
                 //if in bounds & connected get current node and boolean true
                 //if not connected create connection start and other boolean true
@@ -68,6 +59,17 @@ public class Main extends JFrame{
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                for (Vertex node: vertices){
+                if(node.getBounds().contains(e.getLocationOnScreen())) {
+                    intersects = true;
+                    break;
+                }
+            }
+                if(!intersects){
+                    vertex = new Vertex(new Point(e.getX() - 23, e.getY() - 45));
+                    vertices.add(vertex);
+                    repaint();
+                }
                 //if boolean true set new location for current node
                 //if other boolean set end point for connection
             }
@@ -81,6 +83,12 @@ public class Main extends JFrame{
         //mouse listener:
         //clicked - circle
         // pressed and released - connection
+
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
+
+        // Method to execute, initial delay, subsequent delay, time unit
+
+        executor.scheduleAtFixedRate(new Draw(), 0L, 20L, TimeUnit.MILLISECONDS);
 
         this.add(panel);
         this.add(draw);

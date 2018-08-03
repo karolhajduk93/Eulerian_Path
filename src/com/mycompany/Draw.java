@@ -9,14 +9,13 @@ public class Draw extends JComponent implements Runnable {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(2));
 
-        for(int i = 10; i < 40; i = i +3) {
-            //g.clearRect();
-            g2.drawRect(i, i, 10, 10);
-        }
-
-        for (Node node: Main.nodes){
-            g2.draw(node); // how to draw node? - X
+        for (Vertex vertex: Main.vertices){
+            g2.draw(vertex.circle);
+            g2.drawString(Integer.toString(vertex.number), vertex.point.x + 12, vertex.point.y + 20);
+            System.out.println("x: " + vertex.point.x + " y: " + vertex.point.y);
+            System.out.println(vertex.number);
         }
 
         //circle with number inside (has to have bounds - check for connection to happen when pressed and released)
