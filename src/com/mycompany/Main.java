@@ -13,6 +13,7 @@ public class Main extends JFrame{
     public static ArrayList<Vertex> vertices = new ArrayList<>();
     Vertex vertex;
     boolean intersects = false;
+    Rectangle vertexToCheck;
     public static void main(String[] args) {
         //Eulerian PATH can have only 2 odd verticles - start at odd
         //Eulerian CIRCUIT can have only even verticles - start anywhere
@@ -37,21 +38,10 @@ public class Main extends JFrame{
 
             @Override
             public void mousePressed(MouseEvent e) {
-                /*int index = 0;
-                for (Node node: nodes){
-                    if(node.getBounds().contains(new Point(e.getX() - 10, e.getY() - 30))) {
-                        intersects = true;
-                        break;
-                    }
-                    index++;
-                }
-                System.out.println(index); // ------------------
-                System.out.println("(x): " + e.getX() + " (y): " + e.getX());
-                if(!nodes.isEmpty()) {
-                    if (intersects & nodes.get(index-1).isConnected ){
-                        nodes.get(index).setPoint(new Point(e.getX() - 13, e.getY() - 35));
-                    }
-                }*/
+
+                Rectangle rectangle1 = new Rectangle(new Point(138, 144), new Dimension(30, 30));
+                Rectangle rectangle2 = new Rectangle(new Point(147, 127), new Dimension(30, 30));
+                System.out.println(" asdasd" + rectangle1.intersects(rectangle2));
                 // - X
                 //if in bounds & connected get current node and boolean true
                 //if not connected create connection start and other boolean true
@@ -59,18 +49,32 @@ public class Main extends JFrame{
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                for (Vertex node: vertices){
-                if(node.getBounds().contains(e.getLocationOnScreen())) {
-                    intersects = true;
-                    break;
+                vertexToCheck = new Rectangle(new Point(e.getX() - 23, e.getY() - 45), new Dimension(30, 30));
+                for (Vertex vertex: vertices){
+                    if(vertex.getBounds().intersects(vertexToCheck)) {
+                        intersects = true;
+                        System.out.println("XXXXXXXXXXXXXX");
+                        System.out.println(vertex.point.x +  " " + vertex.point.y);
+                        break;
+                    }
                 }
-            }
-                if(!intersects){
-                    vertex = new Vertex(new Point(e.getX() - 23, e.getY() - 45));
+                if((!intersects) & e.getButton() == MouseEvent.BUTTON1){
+                    System.out.println(intersects);
+                    System.out.println((e.getX() - 23) + " " + (e.getY() - 45));
+                    vertex = new Vertex(new Point(e.getX() - 23, e.getY() - 45)); // first created here
                     vertices.add(vertex);
                     repaint();
+                    //intersects = false;
                 }
-                //if boolean true set new location for current node
+                else if(intersects & e.getButton() == MouseEvent.BUTTON3){
+                    System.out.println("Right intersects");
+                    intersects = false;
+                }
+                else if(intersects) {
+                    System.out.println("no i chuj");
+                    intersects = false;
+                }
+                //if boolean true set new location for current vertex
                 //if other boolean set end point for connection
             }
 

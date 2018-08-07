@@ -13,9 +13,13 @@ public class Draw extends JComponent implements Runnable {
 
         for (Vertex vertex: Main.vertices){
             g2.draw(vertex.circle);
-            g2.drawString(Integer.toString(vertex.number), vertex.point.x + 12, vertex.point.y + 20);
+            g2.drawRect(vertex.point.x, vertex.point.y, 30, 30);
+            if(vertex.number < 10)
+                g2.drawString(Integer.toString(vertex.number), vertex.point.x + 12, vertex.point.y + 20);
+            else
+                g2.drawString(Integer.toString(vertex.number), vertex.point.x + 8, vertex.point.y + 20);
             System.out.println("x: " + vertex.point.x + " y: " + vertex.point.y);
-            System.out.println(vertex.number);
+            //System.out.println(vertex.number);
         }
 
         //circle with number inside (has to have bounds - check for connection to happen when pressed and released)

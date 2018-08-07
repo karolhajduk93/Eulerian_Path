@@ -4,8 +4,8 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
 public class Vertex extends Polygon{
-    final int height = 10;
-    final int width = 10;
+    final int height = 30;
+    final int width = 30;
     Point point;
     boolean isConnected = false;
     Shape circle;
