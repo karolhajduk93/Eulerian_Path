@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,8 +13,12 @@ public class Main extends JFrame{
 
     public static ArrayList<Vertex> vertices = new ArrayList<>();
     Vertex vertex;
+    Point point = new Point();
+    Point start, end;
     boolean intersects = false;
     Rectangle vertexToCheck;
+    int mouseButtonPressed, i;
+
     public static void main(String[] args) {
         //Eulerian PATH can have only 2 odd verticles - start at odd
         //Eulerian CIRCUIT can have only even verticles - start anywhere
@@ -32,50 +37,61 @@ public class Main extends JFrame{
         JPanel panel = new JPanel();
         Draw draw = new Draw();
 
+
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            //whats wrong: after clicking other vertex they merge together
+            //
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                //super.mouseDragged(e);
+                point.setLocation(e.getX() - 23, e.getY() - 45);
+                //System.out.println("mouseDraggedButton: " + mouseButtonPressed + " intersects: " + intersects + " i: " + i);
+                if(intersects & (mouseButtonPressed == MouseEvent.BUTTON3)){
+                    vertices.get(i).setPoint(new Point(point));
+                    //System.out.println(vertices.toString());
+                    //??????????????????????????????????????????????????????????????????????????????????????????
+                    //intersects = false;
+                    System.out.print("D*");
+                }
+               
+                System.out.print("D");
+            }
+        });
+
         this.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {}
 
             @Override
             public void mousePressed(MouseEvent e) {
-
-                Rectangle rectangle1 = new Rectangle(new Point(138, 144), new Dimension(30, 30));
-                Rectangle rectangle2 = new Rectangle(new Point(147, 127), new Dimension(30, 30));
-                System.out.println(" asdasd" + rectangle1.intersects(rectangle2));
-                // - X
-                //if in bounds & connected get current node and boolean true
-                //if not connected create connection start and other boolean true
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
+                intersects = false;
+                i = -1;
+                start = new Point(e.getX() - 23, e.getY() - 45);
                 vertexToCheck = new Rectangle(new Point(e.getX() - 23, e.getY() - 45), new Dimension(30, 30));
+                mouseButtonPressed = e.getButton(); // because mouseDragged show 0 not 3 as intended
                 for (Vertex vertex: vertices){
-                    if(vertex.getBounds().intersects(vertexToCheck)) {
+                    i++;
+                    if(vertex.getBounds().intersects(vertexToCheck)) { // if any vertex intersects with rec then its true
                         intersects = true;
-                        System.out.println("XXXXXXXXXXXXXX");
-                        System.out.println(vertex.point.x +  " " + vertex.point.y);
+                        System.out.print("P*");
+                        //System.out.println(vertex.point.x +  " " + vertex.point.y);
                         break;
                     }
                 }
+                System.out.println("P");
+                //intersects = false;
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+                end = new Point(e.getX() - 23, e.getY() - 45);
+                //System.out.println("mouseReleaseButton: " + e.getButton());
                 if((!intersects) & e.getButton() == MouseEvent.BUTTON1){
-                    System.out.println(intersects);
-                    System.out.println((e.getX() - 23) + " " + (e.getY() - 45));
                     vertex = new Vertex(new Point(e.getX() - 23, e.getY() - 45)); // first created here
                     vertices.add(vertex);
-                    repaint();
-                    //intersects = false;
+                    System.out.print("R*");
                 }
-                else if(intersects & e.getButton() == MouseEvent.BUTTON3){
-                    System.out.println("Right intersects");
-                    intersects = false;
-                }
-                else if(intersects) {
-                    System.out.println("no i chuj");
-                    intersects = false;
-                }
-                //if boolean true set new location for current vertex
-                //if other boolean set end point for connection
+                System.out.println("R");
             }
 
             @Override
@@ -83,7 +99,6 @@ public class Main extends JFrame{
             @Override
             public void mouseExited(MouseEvent e) {}
         });
-
         //mouse listener:
         //clicked - circle
         // pressed and released - connection
@@ -92,7 +107,7 @@ public class Main extends JFrame{
 
         // Method to execute, initial delay, subsequent delay, time unit
 
-        executor.scheduleAtFixedRate(new Draw(), 0L, 20L, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(new Repaint(this), 0L, 20L, TimeUnit.MILLISECONDS);
 
         this.add(panel);
         this.add(draw);

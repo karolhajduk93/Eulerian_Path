@@ -2,8 +2,9 @@ package com.mycompany;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
-public class Draw extends JComponent implements Runnable {
+public class Draw extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -12,13 +13,12 @@ public class Draw extends JComponent implements Runnable {
         g2.setStroke(new BasicStroke(2));
 
         for (Vertex vertex: Main.vertices){
-            g2.draw(vertex.circle);
-            g2.drawRect(vertex.point.x, vertex.point.y, 30, 30);
+            //g2.draw(vertex.circle);
+            g2.draw(new Ellipse2D.Double(vertex.point.x, vertex.point.y, 30 ,30));
             if(vertex.number < 10)
                 g2.drawString(Integer.toString(vertex.number), vertex.point.x + 12, vertex.point.y + 20);
             else
                 g2.drawString(Integer.toString(vertex.number), vertex.point.x + 8, vertex.point.y + 20);
-            System.out.println("x: " + vertex.point.x + " y: " + vertex.point.y);
             //System.out.println(vertex.number);
         }
 
@@ -28,10 +28,5 @@ public class Draw extends JComponent implements Runnable {
 
 
 
-    }
-
-    @Override
-    public void run() {
-        this.repaint();
     }
 }
