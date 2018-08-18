@@ -34,11 +34,8 @@ public class Main extends JFrame{
 
 
 
-
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
-
         // Method to execute, initial delay, subsequent delay, time unit
-
         executor.scheduleAtFixedRate(new Repaint(this), 0L, 20L, TimeUnit.MILLISECONDS);
 
         this.add(panel);

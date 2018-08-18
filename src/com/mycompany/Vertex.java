@@ -9,20 +9,20 @@ public class Vertex extends Polygon{
     Point point;
     boolean isConnected;
     Shape circle;
-    int number = 0;
+    int number;
 
     static int iterator = 0;
 
     public Vertex(Point point){
         this.point = point;
-        circle = new Ellipse2D.Double(point.x, point.y, 30 ,30); // ??????????????????????
+        circle = new Ellipse2D.Double(point.x, point.y, 30 ,30);
         iterator++;
         number = iterator;
         isConnected = false;
     }
 
     public Rectangle getBounds(){
-        return new Rectangle(point.x, point.y, width, height);
+        return new Rectangle(point.x , point.y , width, height);
     }
 
     public void setPoint(Point point) {

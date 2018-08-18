@@ -6,36 +6,49 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Draw extends JComponent {
 
     ArrayList<Vertex> vertices = new ArrayList<>();
-    Vertex vertex;
-    Point point = new Point();
-    Point start, end;
+    ArrayList<Line2D> lines = new ArrayList<>();
+    HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
+    Vertex vertexGlobal;
+    Point point = new Point(), start, end;
+    Line2D line;
     boolean intersects = false;
     Rectangle vertexToCheck;
-    int mouseButtonPressed, i;
+    int mouseButtonPressed, i, j;
 
     public Draw(){
+        
         this.addMouseMotionListener(new MouseMotionAdapter() {
-            //whats wrong: after clicking other vertex they merge together
-            //
             @Override
             public void mouseDragged(MouseEvent e) {
-                //super.mouseDragged(e);
                 point.setLocation(e.getX() - 13, e.getY() - 13);
-                //System.out.println("mouseDraggedButton: " + mouseButtonPressed + " intersects: " + intersects + " i: " + i);
+                vertexToCheck = new Rectangle(point, new Dimension(30, 30));
+
+                //vertices intersects handle
+                for (Vertex vertex: vertices){
+                    if(vertex == vertices.get(i))
+                        continue;
+                    if(vertex.getBounds().intersects(vertexToCheck)){
+                        intersects = false;
+                    }
+                }
+                //new coordinates for vertex
                 if(intersects & (mouseButtonPressed == MouseEvent.BUTTON3)){
                     vertices.get(i).setPoint(new Point(point));
-                    //System.out.println(vertices.toString());
-                    //??????????????????????????????????????????????????????????????????????????????????????????
-                    //intersects = false;
-                    System.out.print("D*");
+
                 }
 
-                System.out.print("D");
+                //CREATING LINES BETWEEN VERTICES (Dragged)
+                if(intersects & (mouseButtonPressed == MouseEvent.BUTTON1)){
+                    end = e.getPoint();
+                }
             }
         });
 
@@ -45,34 +58,60 @@ public class Draw extends JComponent {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                //CREATING AND MOVING VERTICES
                 intersects = false;
                 i = -1;
-                start = new Point(e.getX()- 13, e.getY()- 13);
-                vertexToCheck = new Rectangle(new Point(e.getX() - 13, e.getY() - 13), new Dimension(30, 30));
-                mouseButtonPressed = e.getButton(); // because mouseDragged show 0 not 3 as intended
-                for (Vertex vertex: vertices){
+
+                point.setLocation(e.getX() - 13, e.getY() - 13);
+                vertexToCheck = new Rectangle(point, new Dimension(30, 30));
+
+                mouseButtonPressed = e.getButton(); // because mouseDragged show 0 not 3 or 1 as intended
+                for (Vertex vertex: vertices) { // checking if any vertex intersects in moment of clicking
                     i++;
-                    if(vertex.getBounds().intersects(vertexToCheck)) { // if any vertex intersects with rec then its true
+                    if (vertex.getBounds().intersects(vertexToCheck)) {
                         intersects = true;
-                        System.out.print("P*");
-                        //System.out.println(vertex.point.x +  " " + vertex.point.y);
+                        break;
+                    }
+
+                }
+                //CREATING LINES BETWEEN VERTICES (Pressed)
+                for (Vertex vertex: vertices){
+                    if(vertex.getBounds().contains(e.getPoint()) & mouseButtonPressed == MouseEvent.BUTTON1){
+                        start = new Point(vertex.point.x + 15, vertex.point.y +15);
+                        end = start;
+                        intersects = true;
                         break;
                     }
                 }
-                System.out.println("P");
-                //intersects = false;
+
             }
             @Override
             public void mouseReleased(MouseEvent e) {
 
-                end = new Point(e.getX(), e.getY());
-                //System.out.println("mouseReleaseButton: " + e.getButton());
-                if((!intersects) & e.getButton() == MouseEvent.BUTTON1){
-                    vertex = new Vertex(new Point(e.getX() - 13, e.getY() - 13)); // first created here
-                    vertices.add(vertex);
-                    System.out.print("R*");
+                //CREATING AND MOVING VERTICES
+                i = -1;
+                point.setLocation(e.getX() - 13, e.getY() - 13);
+                vertexToCheck = new Rectangle(point, new Dimension(30, 30));
+                mouseButtonPressed = e.getButton(); // because mouseDragged show 0 not 3 or 1 as intended
+                for (Vertex vertex: vertices){ // checking if any vertex intersects in moment of clicking
+                    if(vertex.getBounds().intersects(vertexToCheck)) {
+                        i++;
+                        intersects = true;
+                        break;
+                    }
                 }
-                System.out.println("R");
+                if((!intersects) & e.getButton() == MouseEvent.BUTTON1){
+                    vertexGlobal = new Vertex(new Point(e.getX() - 13, e.getY() - 13)); //creating new vertex
+                    vertices.add(vertexGlobal);
+                }
+
+                //CREATING LINES BETWEEN VERTICES (Release)
+                if(intersects & (mouseButtonPressed == MouseEvent.BUTTON1)){
+                    end = e.getPoint();
+                    lines.add(line);
+                    start = null;
+                    end = null;
+                }
             }
 
             @Override
@@ -80,13 +119,6 @@ public class Draw extends JComponent {
             @Override
             public void mouseExited(MouseEvent e) {}
         });
-        //mouse listener:
-        //clicked - circle
-        // pressed and released - connection
-        //circle with number inside (has to have bounds - check for connection to happen when pressed and released)
-        // circle change possition if in bounds click
-        // straight line (if from bound to bound)
-
     }
     @Override
     protected void paintComponent(Graphics g) {
@@ -95,14 +127,21 @@ public class Draw extends JComponent {
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(2));
 
+        if(start != null && end!= null) {
+            line = new Line2D.Float(start.x, start.y, end.x, end.y);
+            g2.draw(line);
+        }
+
+        for(Line2D line: lines){
+            g2.draw(line);
+        }
+
         for (Vertex vertex: vertices){
-            //g2.draw(vertex.circle);
             g2.draw(new Ellipse2D.Double(vertex.point.x, vertex.point.y, 30 ,30));
             if(vertex.number < 10)
                 g2.drawString(Integer.toString(vertex.number), vertex.point.x + 12, vertex.point.y + 20);
             else
                 g2.drawString(Integer.toString(vertex.number), vertex.point.x + 8, vertex.point.y + 20);
-            //System.out.println(vertex.number);
         }
     }
 }
