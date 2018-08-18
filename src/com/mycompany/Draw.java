@@ -19,12 +19,12 @@ public class Draw extends JComponent {
     Vertex vertexGlobal;
     Point point = new Point(), start, end;
     Line2D line;
-    boolean intersects = false;
+    boolean intersects = false, contains = false;
     Rectangle vertexToCheck;
-    int mouseButtonPressed, i, j;
+    int mouseButtonPressed, i, number;
 
     public Draw(){
-        
+
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
@@ -35,18 +35,18 @@ public class Draw extends JComponent {
                 for (Vertex vertex: vertices){
                     if(vertex == vertices.get(i))
                         continue;
-                    if(vertex.getBounds().intersects(vertexToCheck)){
+                    if(vertex.getBounds().intersects(vertexToCheck) & mouseButtonPressed == MouseEvent.BUTTON3){
                         intersects = false;
                     }
                 }
                 //new coordinates for vertex
                 if(intersects & (mouseButtonPressed == MouseEvent.BUTTON3)){
                     vertices.get(i).setPoint(new Point(point));
-
+                    //moving lines with vertices. hmmmmmmmmmmmmmm????? ***************************************
                 }
 
                 //CREATING LINES BETWEEN VERTICES (Dragged)
-                if(intersects & (mouseButtonPressed == MouseEvent.BUTTON1)){
+                if(contains & (mouseButtonPressed == MouseEvent.BUTTON1)){
                     end = e.getPoint();
                 }
             }
@@ -77,9 +77,10 @@ public class Draw extends JComponent {
                 //CREATING LINES BETWEEN VERTICES (Pressed)
                 for (Vertex vertex: vertices){
                     if(vertex.getBounds().contains(e.getPoint()) & mouseButtonPressed == MouseEvent.BUTTON1){
-                        start = new Point(vertex.point.x + 15, vertex.point.y +15);
+                        number = vertex.number;
+                        start = new Point(vertex.point.x + 15, vertex.point.y + 15);
                         end = start;
-                        intersects = true;
+                        contains = true;
                         break;
                     }
                 }
@@ -95,23 +96,30 @@ public class Draw extends JComponent {
                 mouseButtonPressed = e.getButton(); // because mouseDragged show 0 not 3 or 1 as intended
                 for (Vertex vertex: vertices){ // checking if any vertex intersects in moment of clicking
                     if(vertex.getBounds().intersects(vertexToCheck)) {
-                        i++;
                         intersects = true;
                         break;
                     }
                 }
-                if((!intersects) & e.getButton() == MouseEvent.BUTTON1){
+                if((!intersects) & e.getButton() == MouseEvent.BUTTON1 /*& end == null*/){
                     vertexGlobal = new Vertex(new Point(e.getX() - 13, e.getY() - 13)); //creating new vertex
                     vertices.add(vertexGlobal);
                 }
 
                 //CREATING LINES BETWEEN VERTICES (Release)
-                if(intersects & (mouseButtonPressed == MouseEvent.BUTTON1)){
-                    end = e.getPoint();
-                    lines.add(line);
-                    start = null;
-                    end = null;
+                if(contains & (mouseButtonPressed == MouseEvent.BUTTON1)){
+                    for (Vertex vertex: vertices){
+                        if(vertex.getBounds().contains(e.getPoint()) & mouseButtonPressed == MouseEvent.BUTTON1
+                                & vertex.number != number  & end != null & start != null){
+                            //end = new Point(vertex.point.x + 15, vertex.point.y + 15);
+                            end.setLocation(vertex.point.x + 15, vertex.point.y + 15);
+                            line.setLine(start, end);
+                            lines.add(line);
+                        }
+                    }
+
                 }
+                start = null;
+                end = null;
             }
 
             @Override
@@ -130,8 +138,8 @@ public class Draw extends JComponent {
         if(start != null && end!= null) {
             line = new Line2D.Float(start.x, start.y, end.x, end.y);
             g2.draw(line);
+            System.out.println(line.getP2());
         }
-
         for(Line2D line: lines){
             g2.draw(line);
         }
