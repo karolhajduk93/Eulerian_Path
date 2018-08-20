@@ -11,9 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends JFrame{
 
-    //public static ArrayList<Vertex> vertices = new ArrayList<>();
-
-
     public static void main(String[] args) {
         //Eulerian PATH can have only 2 odd verticles - start at odd
         //Eulerian CIRCUIT can have only even verticles - start anywhere
@@ -31,8 +28,6 @@ public class Main extends JFrame{
 
         JPanel panel = new JPanel();
         Draw draw = new Draw();
-
-
 
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
         // Method to execute, initial delay, subsequent delay, time unit

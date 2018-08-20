@@ -14,18 +14,20 @@ import java.util.HashMap;
 public class Draw extends JComponent {
 
     ArrayList<Vertex> vertices = new ArrayList<>();
-    ArrayList<Line2D> lines = new ArrayList<>();
+    ArrayList<Line> lines = new ArrayList<>();
     HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
     Vertex vertexGlobal;
     Point point = new Point(), start, end;
-    Line2D line;
-    boolean intersects = false, contains = false;
+    Line line;
+    boolean intersects = false, contains = false, exist = false;
     Rectangle vertexToCheck;
     int mouseButtonPressed, i, number;
 
     public Draw(){
 
         this.addMouseMotionListener(new MouseMotionAdapter() {
+
+            //problems to do: all algorithm for Eulerian path
             @Override
             public void mouseDragged(MouseEvent e) {
                 point.setLocation(e.getX() - 13, e.getY() - 13);
@@ -40,13 +42,22 @@ public class Draw extends JComponent {
                     }
                 }
                 //new coordinates for vertex
-                if(intersects & (mouseButtonPressed == MouseEvent.BUTTON3)){
+                if(intersects && (mouseButtonPressed == MouseEvent.BUTTON3)){
                     vertices.get(i).setPoint(new Point(point));
-                    //moving lines with vertices. hmmmmmmmmmmmmmm????? ***************************************
+                    for(Line line: lines){
+                        for(Vertex vertex: vertices){
+                            if(line.startVertex == vertex.number){
+                                line.line.setLine(vertex.point.x + 15, vertex.point.y + 15, line.line.getP2().getX(), line.line.getP2().getY());
+                            }
+                            if(line.endVertex == vertex.number){
+                                line.line.setLine(line.line.getP1().getX(), line.line.getP1().getY(), vertex.point.x + 15, vertex.point.y + 15);
+                            }
+                        }
+                    }
                 }
 
                 //CREATING LINES BETWEEN VERTICES (Dragged)
-                if(contains & (mouseButtonPressed == MouseEvent.BUTTON1)){
+                if(contains && (mouseButtonPressed == MouseEvent.BUTTON1)){
                     end = e.getPoint();
                 }
             }
@@ -76,7 +87,7 @@ public class Draw extends JComponent {
                 }
                 //CREATING LINES BETWEEN VERTICES (Pressed)
                 for (Vertex vertex: vertices){
-                    if(vertex.getBounds().contains(e.getPoint()) & mouseButtonPressed == MouseEvent.BUTTON1){
+                    if(vertex.getBounds().contains(e.getPoint()) && mouseButtonPressed == MouseEvent.BUTTON1){
                         number = vertex.number;
                         start = new Point(vertex.point.x + 15, vertex.point.y + 15);
                         end = start;
@@ -100,26 +111,44 @@ public class Draw extends JComponent {
                         break;
                     }
                 }
-                if((!intersects) & e.getButton() == MouseEvent.BUTTON1 /*& end == null*/){
+                if((!intersects) & e.getButton() == MouseEvent.BUTTON1){
                     vertexGlobal = new Vertex(new Point(e.getX() - 13, e.getY() - 13)); //creating new vertex
                     vertices.add(vertexGlobal);
                 }
 
                 //CREATING LINES BETWEEN VERTICES (Release)
-                if(contains & (mouseButtonPressed == MouseEvent.BUTTON1)){
+                if(contains && (mouseButtonPressed == MouseEvent.BUTTON1)){
                     for (Vertex vertex: vertices){
-                        if(vertex.getBounds().contains(e.getPoint()) & mouseButtonPressed == MouseEvent.BUTTON1
-                                & vertex.number != number  & end != null & start != null){
-                            //end = new Point(vertex.point.x + 15, vertex.point.y + 15);
+                        if(vertex.getBounds().contains(e.getPoint()) && mouseButtonPressed == MouseEvent.BUTTON1
+                                && vertex.number != number  && end != null & start != null){
                             end.setLocation(vertex.point.x + 15, vertex.point.y + 15);
-                            line.setLine(start, end);
-                            lines.add(line);
+                            line.line.setLine(start, end);
+                            line.startVertex = number;
+                            line.endVertex = vertex.number;
+                            //if same line exist dont add
+                            for(Line forLine: lines){
+                                if ((forLine.startVertex == line.startVertex && forLine.endVertex == line.endVertex)
+                                        || (forLine.startVertex == line.endVertex && forLine.endVertex == line.startVertex))
+                                    exist = true;
+                            }
+                            if(!exist)
+                                lines.add(line);
+
+
                         }
                     }
 
                 }
+                int k = 0;
+                for(Line line1: lines){
+                    k++;
+                    System.out.println(k);
+                }
+
                 start = null;
                 end = null;
+                number = -1;
+                exist = false;
             }
 
             @Override
@@ -136,12 +165,11 @@ public class Draw extends JComponent {
         g2.setStroke(new BasicStroke(2));
 
         if(start != null && end!= null) {
-            line = new Line2D.Float(start.x, start.y, end.x, end.y);
-            g2.draw(line);
-            System.out.println(line.getP2());
+            line = new Line(start, end);
+            g2.draw(line.line);
         }
-        for(Line2D line: lines){
-            g2.draw(line);
+        for(Line line: lines){
+            g2.draw(line.line);
         }
 
         for (Vertex vertex: vertices){
