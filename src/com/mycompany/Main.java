@@ -12,12 +12,10 @@ import java.util.concurrent.TimeUnit;
 public class Main extends JFrame {
 
     HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
-
+    int path;
+    boolean connected = true;
 
     public static void main(String[] args) {
-        //Eulerian PATH can have only 2 odd verticles - start at odd
-        //Eulerian CIRCUIT can have only even verticles - start anywhere
-        //If I have to choose i go for "no-bridge" edge (how?)
 
         new Main();
     }
@@ -35,6 +33,8 @@ public class Main extends JFrame {
         calculatePath.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                path = 0;
+                connected = true;
                 //Storing info about connection between vertices
 
                 for (Vertex v : draw.vertices) {
@@ -63,11 +63,27 @@ public class Main extends JFrame {
                     DFS(1, visited);
                 for (boolean b : visited) {
                     if (!b) {
-                        System.out.println("\nGraph is not connected");
+                        connected = false;
                         break;
                     }
                 }
 
+                //Checking if graph has Eulerian path or circuit
+
+                //Eulerian PATH must have exactly 2 odd vertices  - start at odd
+                //Eulerian CIRCUIT can have only even vertices - start anywhere
+
+                for(ArrayList<Integer> list : graph.values()){
+
+                    if(list.size() % 2 == 1)
+                        path++;
+                }
+                if(path == 0 && connected)
+                    System.out.println("circuit");
+                else if(path == 2 && connected)
+                    System.out.println("path");
+                else
+                    System.out.println("Not eulerian");
             }
         });
         panel.add(calculatePath);
