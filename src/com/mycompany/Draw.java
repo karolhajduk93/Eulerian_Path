@@ -15,7 +15,6 @@ public class Draw extends JComponent {
 
     ArrayList<Vertex> vertices = new ArrayList<>();
     ArrayList<Line> lines = new ArrayList<>();
-    HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
     Vertex vertexGlobal;
     Point point = new Point(), start, end;
     Line line;
@@ -139,12 +138,6 @@ public class Draw extends JComponent {
                     }
 
                 }
-                int k = 0;
-                for(Line line1: lines){
-                    k++;
-                    System.out.println(k);
-                }
-
                 start = null;
                 end = null;
                 number = -1;

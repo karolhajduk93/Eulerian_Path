@@ -7,7 +7,6 @@ public class Vertex extends Polygon{
     final int height = 30;
     final int width = 30;
     Point point;
-    boolean isConnected;
     Shape circle;
     int number;
 
@@ -18,7 +17,6 @@ public class Vertex extends Polygon{
         circle = new Ellipse2D.Double(point.x, point.y, 30 ,30);
         iterator++;
         number = iterator;
-        isConnected = false;
     }
 
     public Rectangle getBounds(){
