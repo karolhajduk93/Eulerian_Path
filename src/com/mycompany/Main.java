@@ -4,8 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +13,11 @@ public class Main extends JFrame {
     HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
     int path;
     boolean connected = true;
+    String resultString = "";
+
+    ArrayList<Integer> pathOrCircuit = new ArrayList<>();
+    Deque<Integer> stack = new ArrayDeque<>();
+    int location;
 
     public static void main(String[] args) {
 
@@ -29,6 +33,7 @@ public class Main extends JFrame {
 
         JPanel panel = new JPanel();
         Draw draw = new Draw();
+
         JButton calculatePath = new JButton("CALCULATE PATH");
         calculatePath.addActionListener(new ActionListener() {
             @Override
@@ -73,21 +78,30 @@ public class Main extends JFrame {
                 //Eulerian PATH must have exactly 2 odd vertices  - start at odd
                 //Eulerian CIRCUIT can have only even vertices - start anywhere
 
-                for(ArrayList<Integer> list : graph.values()){
+                for(Map.Entry<Integer, ArrayList<Integer>> graph : graph.entrySet()){
 
-                    if(list.size() % 2 == 1)
+
+                    if(graph.getValue().size() % 2 == 1) {
+                        location = graph.getKey();
+                        //System.out.println(location);
                         path++;
+                    }
                 }
-                if(path == 0 && connected)
-                    System.out.println("circuit");
-                else if(path == 2 && connected)
-                    System.out.println("path");
+                if(path == 0 && connected){
+                    location = draw.vertices.get(new Random().nextInt(Vertex.iterator)).number;
+                    findEulerianPath();
+                    //System.out.println("circuit" + location);
+                }
+                else if(path == 2 && connected) {
+                    //System.out.println("path" + location);
+                    findEulerianPath();
+                }
                 else
                     System.out.println("Not eulerian");
             }
         });
         panel.add(calculatePath);
-
+        
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
         // Method to execute, initial delay, subsequent delay, time unit
         executor.scheduleAtFixedRate(new Repaint(this), 0L, 20L, TimeUnit.MILLISECONDS);
@@ -97,7 +111,7 @@ public class Main extends JFrame {
         this.setVisible(true);
     }
 
-    void DFS(int v, boolean visited[]) {
+    public void DFS(int v, boolean visited[]) {
         // Mark the current node as visited
         visited[v - 1] = true;
 
@@ -106,5 +120,61 @@ public class Main extends JFrame {
                 if (!(visited[i - 1]))
                     DFS(i, visited);
     }
+
+    public void findEulerianPath(){
+        // Algoritm for finding Eulerian Path
+
+        /*
+        location = 2
+        stack = [2]
+        tmp = get->[2](0) = 1
+        remove [2](0) -> 1
+        .. remove [tmp/1](0)-> 2
+        */
+        pathOrCircuit.clear();
+
+        int i = 0;
+        while(!(graph.get(location).isEmpty() && stack.isEmpty())) {
+            int tmp;
+            i++;
+            if ( i > 100)
+                break;
+            //System.out.print(" g: " + graph.get(location).isEmpty() + " s: " + stack.isEmpty());
+            System.out.println("STACK" + stack.toString());
+
+            if (!graph.get(location).isEmpty()) {
+                stack.push(location);
+                System.out.println("A");
+                tmp = graph.get(location).get(0);  // bierzemy
+                graph.get(location).remove(0); // i usuwamy pierwszego "sasiada" z brzegu [3]-> [2] tmp = 2
+                System.out.println(location + "=" + graph.get(location).toString());
+                int k = 0;
+               for(Integer j: graph.get(tmp)){
+                   if(j == location) {
+                       break;
+                   }
+                   k++;
+               }
+
+                graph.get(tmp).remove(k);
+               // czyli nie zero tylko odpowaidajace || musimy wziac z [2]->[3] a nie [1] jak teraz ????????????? 3
+                System.out.println(tmp + "=" + graph.get(tmp).toString());
+                location = tmp;
+            } else if (graph.get(location).isEmpty() && !stack.isEmpty()) {
+                System.out.println("B");
+                pathOrCircuit.add(location);
+                location = stack.pop();
+            }
+            if (graph.get(location).isEmpty() && stack.isEmpty()) {
+                System.out.println("C");
+                pathOrCircuit.add(location);
+            }
+        }
+        //System.out.println("\n" + stack.toString());
+        System.out.println(pathOrCircuit.toString());
+        resultString = pathOrCircuit.toString();
+
+
+
+    }
 }
-    // The function to do DFS traversal. It uses recursive DFSUtil()

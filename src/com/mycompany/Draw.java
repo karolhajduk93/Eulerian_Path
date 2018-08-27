@@ -166,11 +166,16 @@ public class Draw extends JComponent {
         }
 
         for (Vertex vertex: vertices){
+            g2.setColor(Color.BLACK);
             g2.draw(new Ellipse2D.Double(vertex.point.x, vertex.point.y, 30 ,30));
-            if(vertex.number < 10)
+            if(vertex.number < 10) {
+                g2.setColor(Color.red);
                 g2.drawString(Integer.toString(vertex.number), vertex.point.x + 12, vertex.point.y + 20);
-            else
+            }
+            else {
+                g2.setColor(Color.red);
                 g2.drawString(Integer.toString(vertex.number), vertex.point.x + 8, vertex.point.y + 20);
+            }
         }
     }
 }
