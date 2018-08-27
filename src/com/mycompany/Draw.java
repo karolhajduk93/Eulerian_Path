@@ -82,7 +82,6 @@ public class Draw extends JComponent {
                         intersects = true;
                         break;
                     }
-
                 }
                 //CREATING LINES BETWEEN VERTICES (Pressed)
                 for (Vertex vertex: vertices){
@@ -94,7 +93,6 @@ public class Draw extends JComponent {
                         break;
                     }
                 }
-
             }
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -119,24 +117,21 @@ public class Draw extends JComponent {
                 if(contains && (mouseButtonPressed == MouseEvent.BUTTON1)){
                     for (Vertex vertex: vertices){
                         if(vertex.getBounds().contains(e.getPoint()) && mouseButtonPressed == MouseEvent.BUTTON1
-                                && vertex.number != number  && end != null & start != null){
+                                && vertex.number != number  && end != null & start != null) {
                             end.setLocation(vertex.point.x + 15, vertex.point.y + 15);
                             line.line.setLine(start, end);
                             line.startVertex = number;
                             line.endVertex = vertex.number;
                             //if same line exist dont add
-                            for(Line forLine: lines){
+                            for (Line forLine : lines) {
                                 if ((forLine.startVertex == line.startVertex && forLine.endVertex == line.endVertex)
                                         || (forLine.startVertex == line.endVertex && forLine.endVertex == line.startVertex))
                                     exist = true;
                             }
-                            if(!exist)
+                            if (!exist)
                                 lines.add(line);
-
-
                         }
                     }
-
                 }
                 start = null;
                 end = null;
